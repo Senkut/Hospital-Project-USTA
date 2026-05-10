@@ -71,7 +71,7 @@ public class PlanPracticasRepository {
             int idServicio, String fecha,
             String horaInicio, String horaFin) {
         // Buscar o crear plan del mes
-        String mesActual = fecha.substring(0, 7); // "2026-05"
+
         int anio = Integer.parseInt(fecha.substring(0, 4));
         int mes = Integer.parseInt(fecha.substring(5, 7));
 
