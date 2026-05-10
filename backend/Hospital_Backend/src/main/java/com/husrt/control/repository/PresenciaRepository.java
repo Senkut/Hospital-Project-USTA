@@ -30,23 +30,21 @@ public class PresenciaRepository {
                 LEFT JOIN servicio_hospitalario sh ON sh.id_servicio = ap.id_servicio
                 WHERE ra.resultado_validacion = 'APROBADO'
                 AND ra.timestamp_salida IS NULL
-                AND CAST(ra.timestamp_entrada AS DATE) = CURRENT_DATE
+                AND ra.timestamp_entrada::date = CURRENT_DATE
                 ORDER BY ra.timestamp_entrada DESC
                 """);
     }
 
-    // Conteo total dentro ahora
     public int totalDentro() {
         Integer count = jdbc.queryForObject("""
                 SELECT COUNT(*) FROM registro_acceso
                 WHERE resultado_validacion = 'APROBADO'
                 AND timestamp_salida IS NULL
-                AND CAST(timestamp_entrada AS DATE) = CURRENT_DATE
+                AND timestamp_entrada::date = CURRENT_DATE
                 """, Integer.class);
         return count != null ? count : 0;
     }
 
-    // Alertas: estudiantes con franja vencida que siguen dentro
     public List<Map<String, Object>> alertasFranjaVencida() {
         return jdbc.queryForList("""
                 SELECT e.nombre || ' ' || e.apellido AS nombre_completo,
@@ -59,7 +57,7 @@ public class PresenciaRepository {
                 LEFT JOIN servicio_hospitalario sh ON sh.id_servicio = ap.id_servicio
                 WHERE ra.resultado_validacion = 'APROBADO'
                 AND ra.timestamp_salida IS NULL
-                AND CAST(ra.timestamp_entrada AS DATE) = CURRENT_DATE
+                AND ra.timestamp_entrada::date = CURRENT_DATE
                 AND ap.hora_fin < CURRENT_TIME
                 """);
     }

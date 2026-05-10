@@ -118,3 +118,28 @@ export const alertasApi = {
     listar: () =>
         fetch('/api/alertas').then(r => r.json())
 };
+
+export const PERMISOS_POR_ROL: Record<string, string[]> = {
+    administrador: [
+        'ver_dashboard', 'ver_presencia', 'ver_registro_estudiantes',
+        'ver_usuarios', 'ver_areas', 'ver_horarios',
+        'ver_cronograma', 'ver_reportes'
+    ],
+    coordinador: [
+        'ver_dashboard', 'ver_presencia', 'ver_registro_estudiantes',
+        'ver_horarios', 'ver_cronograma', 'ver_reportes'
+    ],
+    director: [
+        'ver_dashboard', 'ver_presencia', 'ver_reportes'
+    ],
+    porteria: [
+        'ver_presencia'
+        // Solo ve el panel de presencia para validar accesos
+    ],
+    docente: [
+        'ver_dashboard', 'ver_cronograma'
+    ],
+    consulta: [
+        'ver_dashboard', 'ver_reportes'
+    ]
+};

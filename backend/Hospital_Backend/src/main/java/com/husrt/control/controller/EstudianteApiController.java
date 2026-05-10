@@ -42,24 +42,80 @@ public class EstudianteApiController {
     @PostMapping
     public Map<String, Object> registrar(@RequestBody Map<String, Object> datos) {
         Estudiante e = new Estudiante();
-        String nombreCompleto = (String) datos.get("name");
-        String[] partes = nombreCompleto != null ? nombreCompleto.split(" ", 2) : new String[] { "", "" };
-        e.setNombre(partes[0]);
-        e.setApellido(partes.length > 1 ? partes[1] : "");
+
+        // Nombres — el frontend manda nombresCompletos y apellidos por separado
+        String nombresCompletos = (String) datos.get("nombresCompletos");
+        String apellidos = (String) datos.get("apellidos");
+
+        // Compatibilidad con formato antiguo que manda "name" completo
+        if (nombresCompletos == null || nombresCompletos.isBlank()) {
+            String nameCompleto = (String) datos.get("name");
+            if (nameCompleto != null) {
+                String[] partes = nameCompleto.split(" ", 2);
+                nombresCompletos = partes[0];
+                apellidos = partes.length > 1 ? partes[1] : "";
+            }
+        }
+
+        e.setNombresCompletos(nombresCompletos);
+        e.setApellidos(apellidos);
+        // nombre y apellido son NOT NULL — usar primera palabra de cada campo
+        e.setNombre(nombresCompletos != null && !nombresCompletos.isBlank()
+                ? nombresCompletos.split(" ")[0]
+                : "Sin nombre");
+        e.setApellido(apellidos != null && !apellidos.isBlank()
+                ? apellidos.split(" ")[0]
+                : "Sin apellido");
+
         e.setCedula((String) datos.get("cedula"));
         e.setProgramaAcademico((String) datos.get("programa"));
-        e.setSemestreAcademico(
-                datos.get("semestre") != null ? Integer.parseInt(datos.get("semestre").toString()) : null);
+        e.setInstitucionEducativa((String) datos.get("institucionEducativa"));
+        e.setTipoVinculacion((String) datos.get("tipoVinculacion"));
+        e.setTipoDocumento((String) datos.get("tipoDocumento"));
+        e.setEstadoCivil((String) datos.get("estadoCivil"));
+        e.setGenero((String) datos.get("genero"));
+        e.setCelular((String) datos.get("celular"));
+        e.setEmail((String) datos.get("email"));
+        e.setDireccionTunja((String) datos.get("direccionTunja"));
+        e.setLugarNacimiento((String) datos.get("lugarNacimiento"));
+        e.setNombreRepresentante((String) datos.get("nombreRepresentante"));
+        e.setParentesco((String) datos.get("parentesco"));
+        e.setGrupoSanguineo((String) datos.get("grupoSanguineo"));
+
+        // Booleanos
         e.setInduccionCompletada(Boolean.TRUE.equals(datos.get("induccionHospitalaria")));
-        e.setEstado(datos.get("estado") != null ? datos.get("estado").toString().toLowerCase() : "activo");
+        e.setTieneHijos(Boolean.TRUE.equals(datos.get("tieneHijos")));
 
-        String fechaARL = (String) datos.get("fechaARL");
-        if (fechaARL != null && !fechaARL.isEmpty())
-            e.setArlVigenciaFin(java.time.LocalDate.parse(fechaARL));
+        // Semestre
+        Object sem = datos.get("semestre");
+        if (sem != null && !sem.toString().isBlank()) {
+            try {
+                e.setSemestreAcademico(Integer.parseInt(sem.toString()));
+            } catch (NumberFormatException ex) {
+                e.setSemestreAcademico(null);
+            }
+        }
 
-        String fechaInd = (String) datos.get("fechaInduccion");
-        if (fechaInd != null && !fechaInd.isEmpty())
-            e.setFechaInduccion(java.time.LocalDate.parse(fechaInd));
+        // Estado
+        Object estadoObj = datos.get("estado");
+        e.setEstado(estadoObj != null ? estadoObj.toString().toLowerCase() : "activo");
+
+        // Fechas
+        try {
+            String fechaARL = (String) datos.get("fechaARL");
+            if (fechaARL != null && !fechaARL.isBlank())
+                e.setArlVigenciaFin(java.time.LocalDate.parse(fechaARL));
+
+            String fechaInd = (String) datos.get("fechaInduccion");
+            if (fechaInd != null && !fechaInd.isBlank())
+                e.setFechaInduccion(java.time.LocalDate.parse(fechaInd));
+
+            String fechaNac = (String) datos.get("fechaNacimiento");
+            if (fechaNac != null && !fechaNac.isBlank())
+                e.setFechaNacimiento(java.time.LocalDate.parse(fechaNac));
+        } catch (Exception ex) {
+            System.err.println("Error parseando fecha: " + ex.getMessage());
+        }
 
         String resultado = service.registrar(e);
         return Map.of("ok", resultado.equals("OK"), "mensaje", resultado);

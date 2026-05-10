@@ -10,6 +10,7 @@ public class Docente {
     private String rol; // medico, docente, director
     private String password;
     private String estado;
+    private Boolean activo;
 
     public Docente() {
     }
@@ -84,5 +85,13 @@ public class Docente {
 
     public void setEstado(String estado) {
         this.estado = estado;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 }

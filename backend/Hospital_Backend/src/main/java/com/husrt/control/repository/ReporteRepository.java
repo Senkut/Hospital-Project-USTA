@@ -42,10 +42,10 @@ public class ReporteRepository {
                     e.nombre || ' ' || e.apellido AS nombre_completo,
                     e.programa_academico,
                     e.arl_vigencia_fin,
-                    DATEDIFF('DAY', CURRENT_DATE, e.arl_vigencia_fin) AS dias_restantes
+                    (e.arl_vigencia_fin - CURRENT_DATE) AS dias_restantes
                 FROM estudiante e
                 WHERE e.arl_vigencia_fin IS NOT NULL
-                AND e.arl_vigencia_fin <= DATEADD('DAY', 15, CURRENT_DATE)
+                AND e.arl_vigencia_fin <= CURRENT_DATE + INTERVAL '15 days'
                 AND e.estado = 'activo'
                 ORDER BY e.arl_vigencia_fin ASC
                 """);
@@ -61,7 +61,7 @@ public class ReporteRepository {
                 FROM registro_acceso ra
                 JOIN estudiante e ON e.id_estudiante = ra.id_estudiante
                 WHERE ra.resultado_validacion = 'RECHAZADO'
-                AND CAST(ra.timestamp_entrada AS DATE) = CURRENT_DATE
+                AND ra.timestamp_entrada::date = CURRENT_DATE
                 ORDER BY ra.timestamp_entrada DESC
                 """);
     }

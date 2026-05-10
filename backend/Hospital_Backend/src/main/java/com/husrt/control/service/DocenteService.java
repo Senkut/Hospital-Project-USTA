@@ -38,4 +38,12 @@ public class DocenteService {
     public void eliminar(String cedula) {
         repo.eliminar(cedula);
     }
+
+    public void cambiarEstado(String cedula, boolean activo) {
+        repo.cambiarEstado(cedula, activo);
+    }
+
+    public void cambiarPassword(String cedula, String nuevaPassword) {
+        repo.cambiarPassword(cedula, nuevaPassword);
+    }
 }

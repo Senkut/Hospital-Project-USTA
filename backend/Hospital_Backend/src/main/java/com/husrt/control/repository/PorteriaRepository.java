@@ -76,8 +76,7 @@ public class PorteriaRepository {
     public void registrarSalida(Integer idEstudiante) {
         jdbc.update("""
                 UPDATE registro_acceso
-                SET timestamp_salida = ?,
-                    horas_cumplidas = DATEDIFF('MINUTE', timestamp_entrada, ?) / 60.0
+                "SET timestamp_salida = ?, horas_cumplidas = EXTRACT(EPOCH FROM (? - timestamp_entrada)) / 3600"
                 WHERE id_estudiante = ?
                 AND timestamp_salida IS NULL
                 AND CAST(timestamp_entrada AS DATE) = CURRENT_DATE

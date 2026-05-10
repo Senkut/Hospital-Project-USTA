@@ -13,7 +13,8 @@ import { Login } from './components/Login';
 import { StudentDashboard } from './components/StudentDashboard';
 import { hasPermission, getRolePermissions } from './utils/permissions';
 import { useEffect } from 'react';
-import { horariosApi, areasApi, usuariosApi } from './services/api';
+import { horariosApi, areasApi, usuariosApi, authApi, estudiantesApi } from './services/api';
+
 
 interface User {
   id: string;
@@ -511,28 +512,110 @@ export default function App() {
     toast.success('Horario eliminado');
   };
 
-  const handleAddStudent = (studentData: Omit<Student, 'id'>) => {
-    // Verificar si la cédula ya existe
+  const handleAddStudent = async (studentData: Omit<Student, 'id'>) => {
+    // Verificar cédula duplicada localmente primero
     const cedulaExists = students.some(s => s.cedula === studentData.cedula);
     if (cedulaExists) {
       toast.error('Esta cédula ya está registrada en el sistema');
       return;
     }
 
-    // Generar ID autoincrementado
-    const newId = students.length > 0
-      ? String(Math.max(...students.map(s => parseInt(s.id) || 0)) + 1).padStart(3, '0')
-      : '001';
+    try {
+      // Enviar al backend
+      const resp = await estudiantesApi.registrar({
+        nombresCompletos: studentData.nombresCompletos || studentData.name?.split(' ')[0] || '',
+        apellidos: studentData.apellidos || studentData.name?.split(' ').slice(1).join(' ') || '',
+        cedula: studentData.cedula,
+        programa: studentData.programa || (studentData as any).programaAcademico || '',
+        institucionEducativa: studentData.institucionEducativa || '',
+        tipoVinculacion: studentData.tipoVinculacion || 'Estudiante en práctica',
+        tipoDocumento: studentData.tipoDocumento || 'C.C.',
+        estadoCivil: studentData.estadoCivil || '',
+        genero: studentData.genero || 'masculino',
+        celular: studentData.celular || '',
+        email: studentData.email || '',
+        direccionTunja: studentData.direccionTunja || '',
+        lugarNacimiento: studentData.lugarNacimiento || '',
+        nombreRepresentante: (studentData as any).nombreRepresentante || (studentData as any).nombreRepresentanteLegal || '',
+        parentesco: studentData.parentesco || '',
+        grupoSanguineo: (studentData as any).grupoSanguineo || '',
+        tieneHijos: studentData.tieneHijos || false,
+        induccionHospitalaria: studentData.induccionHospitalaria || false,
+        fechaInduccion: studentData.fechaInduccion || '',
+        arl: studentData.arl || false,
+        fechaARL: studentData.fechaARL || '',
+        fechaNacimiento: studentData.fechaNacimiento || '',
+        semestre: studentData.semestre || '',
+        estado: 'ACTIVO'
+      });
 
-    const newStudent: Student = {
-      ...studentData,
-      id: newId,
-      estado: 'ACTIVO',
-      attendanceHistory: []
-    };
+      if (resp.ok) {
+        // Agregar al estado local con ID temporal
+        const newId = students.length > 0
+          ? String(Math.max(...students.map(s => parseInt(s.id) || 0)) + 1).padStart(3, '0')
+          : '001';
 
-    setStudents([...students, newStudent]);
-    toast.success(`Estudiante registrado exitosamente con ID #${newId}`);
+        const newStudent: Student = {
+          ...studentData,
+          id: newId,
+          estado: 'ACTIVO',
+          attendanceHistory: []
+        };
+
+        setStudents([...students, newStudent]);
+        toast.success(`Estudiante registrado correctamente en el sistema`);
+
+        // Recargar desde el backend para tener el ID real de la BD
+        estudiantesApi.listar()
+          .then(data => {
+            if (Array.isArray(data) && data.length > 0) {
+              const mapped = data.map((e: any) => ({
+                id: String(e.id),
+                cedula: e.cedula,
+                name: e.name || e.nombresCompletos + ' ' + e.apellidos,
+                nombresCompletos: e.nombresCompletos || '',
+                apellidos: e.apellidos || '',
+                programa: e.programa || '',
+                programaAcademico: e.programa || '',
+                institucionEducativa: e.institucionEducativa || '',
+                tipoVinculacion: (e.tipoVinculacion || 'Estudiante en práctica') as any,
+                tipoDocumento: (e.tipoDocumento || 'C.C.') as any,
+                estadoCivil: (e.estadoCivil || 'Soltero(a)') as any,
+                fechaNacimiento: e.fechaNacimiento || '',
+                lugarNacimiento: e.lugarNacimiento || '',
+                direccionTunja: e.direccionTunja || '',
+                lugarResidenciaPermanente: '',
+                celular: e.celular || '',
+                email: e.email || '',
+                direccionRepresentanteLegal: '',
+                ciudadRepresentanteLegal: '',
+                nombreRepresentanteLegal: e.nombreRepresentante || '',
+                parentesco: (studentData as any).parentesco || '',
+                celularRepresentanteLegal: '',
+                tieneHijos: e.tieneHijos || false,
+                genero: (e.genero || 'masculino') as any,
+                induccionHospitalaria: e.induccionHospitalaria || false,
+                fechaInduccion: e.fechaInduccion || '',
+                arl: e.arl || false,
+                fechaARL: e.fechaARL || '',
+                estado: (e.estado || 'ACTIVO') as any,
+                semestre: String(e.semestre || ''),
+                attendanceHistory: [],
+                foto: '',
+                password: e.cedula
+              }));
+              setStudents(mapped as any);
+            }
+          })
+          .catch(() => console.log('Error recargando lista'));
+
+      } else {
+        toast.error(resp.mensaje || 'Error al registrar el estudiante');
+      }
+    } catch (err) {
+      console.error('Error registrando estudiante:', err);
+      toast.error('Error de conexión con el servidor');
+    }
   };
 
   const handleUpdateStudent = (id: string, studentData: Partial<Student>) => {

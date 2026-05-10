@@ -60,8 +60,8 @@ public class PlanPracticasRepository {
                 JOIN servicio_hospitalario sh ON sh.id_servicio = ap.id_servicio
                 JOIN plan_practicas pp ON pp.id_plan = ap.id_plan
                 JOIN docente d ON d.id_docente = pp.id_docente
-                WHERE YEAR(ap.fecha_especifica) = ?
-                AND MONTH(ap.fecha_especifica) = ?
+                WHERE EXTRACT(YEAR FROM ap.fecha_especifica) = ?
+                AND EXTRACT(MONTH FROM ap.fecha_especifica) = ?
                 ORDER BY ap.fecha_especifica, ap.hora_inicio
                 """, anio, mes);
     }

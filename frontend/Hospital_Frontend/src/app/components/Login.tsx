@@ -58,7 +58,7 @@ export function Login({ onLogin }: LoginProps) {
               {/* Aquí puedes colocar tu logo */}
               <Building2 className="w-14 h-14 text-white" />
             </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-600 to-teal-600 bg-clip-text text-transparent mb-2" style={{fontFamily: 'Poppins, sans-serif'}}>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-600 to-teal-600 bg-clip-text text-transparent mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
               Hospital Universitario San Rafael
             </h1>
             <p className="text-gray-600 font-medium">Sistema de Gestión Hospitalaria</p>
@@ -76,7 +76,7 @@ export function Login({ onLogin }: LoginProps) {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Role Selection */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-3" style={{fontFamily: 'Poppins, sans-serif'}}>
+              <label className="block text-sm font-bold text-gray-700 mb-3" style={{ fontFamily: 'Poppins, sans-serif' }}>
                 Tipo de Usuario
               </label>
               <div className="grid grid-cols-2 gap-3">
@@ -85,11 +85,10 @@ export function Login({ onLogin }: LoginProps) {
                     key={r.value}
                     type="button"
                     onClick={() => setRole(r.value)}
-                    className={`p-3 rounded-xl border-2 transition-all duration-300 font-semibold text-sm ${
-                      role === r.value
+                    className={`p-3 rounded-xl border-2 transition-all duration-300 font-semibold text-sm ${role === r.value
                         ? `bg-gradient-to-r ${r.color} text-white border-transparent shadow-lg scale-105`
                         : 'bg-white border-gray-200 text-gray-700 hover:border-cyan-300 hover:shadow-md'
-                    }`}
+                      }`}
                   >
                     {r.label}
                   </button>
@@ -99,7 +98,7 @@ export function Login({ onLogin }: LoginProps) {
 
             {/* Document Number */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2" style={{fontFamily: 'Poppins, sans-serif'}}>
+              <label className="block text-sm font-bold text-gray-700 mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
                 Ingresa tu número de identificación
               </label>
               <div className="relative">
@@ -119,7 +118,7 @@ export function Login({ onLogin }: LoginProps) {
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2" style={{fontFamily: 'Poppins, sans-serif'}}>
+              <label className="block text-sm font-bold text-gray-700 mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
                 Contraseña
               </label>
               <div className="relative">
@@ -147,7 +146,7 @@ export function Login({ onLogin }: LoginProps) {
             <button
               type="submit"
               className="w-full bg-gradient-to-r from-cyan-500 to-teal-500 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl hover:from-cyan-600 hover:to-teal-600 transition-all duration-300 transform hover:-translate-y-1"
-              style={{fontFamily: 'Poppins, sans-serif'}}
+              style={{ fontFamily: 'Poppins, sans-serif' }}
             >
               Iniciar Sesión
             </button>

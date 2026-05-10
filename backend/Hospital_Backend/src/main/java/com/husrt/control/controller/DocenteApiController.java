@@ -62,29 +62,66 @@ public class DocenteApiController {
         String cedula = datos.get("cedula");
         String password = datos.get("password");
 
-        // Admin hardcodeado igual que el frontend
-        if ("1234567890".equals(cedula) && "admin2026".equals(password)) {
-            return Map.of(
-                    "ok", true,
-                    "role", "administrador",
-                    "name", "Administrador del Sistema",
-                    "cedula", cedula);
+        if (cedula == null || password == null) {
+            return Map.of("ok", false, "mensaje", "Credenciales incompletas");
         }
 
-        // Buscar en docentes/usuarios de la BD
-        Optional<Docente> docente = service.buscarPorCedula(cedula);
-        if (docente.isPresent()) {
-            Docente d = docente.get();
-            String pwd = d.getPassword() != null ? d.getPassword() : d.getCedula();
-            if (pwd.equals(password)) {
-                return Map.of(
-                        "ok", true,
-                        "role", d.getRol() != null ? d.getRol() : "docente",
-                        "name", d.getNombre() + " " + d.getApellido(),
-                        "cedula", cedula);
+        Optional<Docente> opt = service.buscarPorCedula(cedula);
+
+        if (opt.isEmpty()) {
+            return Map.of("ok", false, "mensaje", "Usuario no encontrado");
+        }
+
+        Docente d = opt.get();
+
+        // Verificar que está activo
+        if (!Boolean.TRUE.equals(d.getActivo())) {
+            return Map.of("ok", false, "mensaje", "Usuario inactivo — contacte al administrador");
+        }
+
+        // Verificar contraseña
+        String pwdBD = d.getPassword() != null ? d.getPassword() : "";
+        if (!pwdBD.equals(password)) {
+            return Map.of("ok", false, "mensaje", "Contraseña incorrecta");
+        }
+
+        // Login exitoso
+        return Map.of(
+                "ok", true,
+                "cedula", d.getCedula(),
+                "name", d.getNombre() + " " + d.getApellido(),
+                "role", d.getRol() != null ? d.getRol() : "consulta",
+                "mensaje", "Bienvenido");
+    }
+
+    @PutMapping("/{cedula}/estado")
+    public Map<String, Object> cambiarEstado(
+            @PathVariable String cedula,
+            @RequestBody Map<String, Object> datos) {
+        try {
+            boolean activo = Boolean.TRUE.equals(datos.get("activo"));
+            service.cambiarEstado(cedula, activo);
+            return Map.of("ok", true,
+                    "mensaje", activo ? "Usuario activado" : "Usuario desactivado");
+        } catch (Exception e) {
+            return Map.of("ok", false, "mensaje", e.getMessage());
+        }
+    }
+
+    @PutMapping("/{cedula}/password")
+    public Map<String, Object> cambiarPassword(
+            @PathVariable String cedula,
+            @RequestBody Map<String, String> datos) {
+        try {
+            String nuevaPassword = datos.get("password");
+            if (nuevaPassword == null || nuevaPassword.length() < 6) {
+                return Map.of("ok", false,
+                        "mensaje", "La contraseña debe tener al menos 6 caracteres");
             }
+            service.cambiarPassword(cedula, nuevaPassword);
+            return Map.of("ok", true, "mensaje", "Contraseña actualizada");
+        } catch (Exception e) {
+            return Map.of("ok", false, "mensaje", e.getMessage());
         }
-
-        return Map.of("ok", false, "mensaje", "Credenciales incorrectas");
     }
 }

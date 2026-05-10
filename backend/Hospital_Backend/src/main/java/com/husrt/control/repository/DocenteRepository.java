@@ -25,7 +25,11 @@ public class DocenteRepository {
         d.setApellido(rs.getString("apellido"));
         d.setIdUniversidad(rs.getInt("id_universidad"));
         d.setProgramaQueSupervisa(rs.getString("programa_que_supervisa"));
-        // rol y password pueden no existir aún en la tabla — los agregamos al schema
+        try {
+            d.setActivo(rs.getBoolean("activo"));
+        } catch (Exception e) {
+            d.setActivo(true);
+        }
         try {
             d.setRol(rs.getString("rol"));
         } catch (Exception e) {
@@ -44,6 +48,7 @@ public class DocenteRepository {
     }
 
     public Optional<Docente> buscarPorCedula(String cedula) {
+        // Asegúrate que el RowMapper incluya el campo 'activo'
         List<Docente> r = jdbc.query(
                 "SELECT * FROM docente WHERE cedula = ?", mapper, cedula);
         return r.isEmpty() ? Optional.empty() : Optional.of(r.get(0));
@@ -70,4 +75,14 @@ public class DocenteRepository {
     public void eliminar(String cedula) {
         jdbc.update("DELETE FROM docente WHERE cedula = ?", cedula);
     }
+
+    public void cambiarEstado(String cedula, boolean activo) {
+        jdbc.update("UPDATE docente SET activo = ? WHERE cedula = ?", activo, cedula);
+    }
+
+    public void cambiarPassword(String cedula, String nuevaPassword) {
+        jdbc.update("UPDATE docente SET password = ? WHERE cedula = ?",
+                nuevaPassword, cedula);
+    }
+
 }
