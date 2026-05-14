@@ -21,14 +21,8 @@ public class EstudianteRepository {
         Estudiante e = new Estudiante();
         e.setIdEstudiante(rs.getInt("id_estudiante"));
         e.setCedula(rs.getString("cedula"));
-        e.setNombre(rs.getString("nombre"));
-        e.setApellido(rs.getString("apellido"));
-        e.setNombresCompletos(rs.getString("nombres_completos") != null
-                ? rs.getString("nombres_completos")
-                : rs.getString("nombre"));
-        e.setApellidos(rs.getString("apellidos") != null
-                ? rs.getString("apellidos")
-                : rs.getString("apellido"));
+        e.setNombresCompletos(rs.getString("nombres_completos"));
+        e.setApellidosCompletos(rs.getString("apellidos_completos"));
         e.setProgramaAcademico(rs.getString("programa_academico"));
         e.setInstitucionEducativa(rs.getString("institucion_educativa"));
         e.setTipoVinculacion(rs.getString("tipo_vinculacion"));
@@ -62,8 +56,9 @@ public class EstudianteRepository {
     };
 
     public List<Estudiante> listarTodos() {
+        // FIX: columnas correctas son apellidos_completos y nombres_completos
         return jdbc.query(
-                "SELECT * FROM estudiante ORDER BY apellido, nombre", mapper);
+                "SELECT * FROM estudiante ORDER BY apellidos_completos, nombres_completos", mapper);
     }
 
     public Optional<Estudiante> buscarPorCedula(String cedula) {
@@ -83,7 +78,7 @@ public class EstudianteRepository {
         jdbc.update(
                 """
                         INSERT INTO estudiante
-                        (cedula, nombre, apellido, nombres_completos, apellidos,
+                        (cedula, nombres_completos, apellidos_completos,
                         programa_academico, institucion_educativa, tipo_vinculacion,
                         tipo_documento, estado_civil, fecha_nacimiento, lugar_nacimiento,
                         genero, direccion_tunja, lugar_residencia_permanente,
@@ -96,14 +91,11 @@ public class EstudianteRepository {
                         nombre_padre, edad_padre, nombre_madre, edad_madre,
                         enfermedades_generales, enfermedades_mentales, medicamentos, alergias,
                         peso, talla, imc, companeros_tunja, nucleo_familiar_tunja, estado)
-                        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'activo')
+                        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'activo')
                         """,
                 e.getCedula(),
-                e.getNombre() != null ? e.getNombre()
-                        : (e.getNombresCompletos() != null ? e.getNombresCompletos().split(" ")[0] : ""),
-                e.getApellido() != null ? e.getApellido() : (e.getApellidos() != null ? e.getApellidos() : ""),
                 e.getNombresCompletos(),
-                e.getApellidos(),
+                e.getApellidosCompletos(),
                 e.getProgramaAcademico(),
                 e.getInstitucionEducativa(),
                 e.getTipoVinculacion(),
@@ -128,7 +120,7 @@ public class EstudianteRepository {
                 e.getEdadEsposo(),
                 e.getGrupoSanguineo(),
                 e.getSemestreAcademico(),
-                e.getIdUniversidad(),
+                e.getIdUniversidad() != null ? e.getIdUniversidad() : 1,
                 e.getInduccionCompletada(),
                 e.getFechaInduccion(),
                 e.getArlVigenciaInicio(),
@@ -155,10 +147,11 @@ public class EstudianteRepository {
     }
 
     public void actualizar(String cedula, Estudiante e) {
+        // FIX: SQL corregido — faltaba coma y había campos duplicados
         jdbc.update("""
                 UPDATE estudiante SET
                 nombres_completos = ?,
-                apellidos = ?,
+                apellidos_completos = ?,
                 programa_academico = ?,
                 institucion_educativa = ?,
                 tipo_vinculacion = ?,
@@ -174,23 +167,21 @@ public class EstudianteRepository {
                 nombre_representante = ?,
                 parentesco = ?,
                 celular_representante = ?,
-                tiene_hijos = ?,
-                grupo_sanguineo = ?,
-                semestre_academico = ?
-                lugar_residencia_permanente = ?,
                 direccion_representante = ?,
                 ciudad_representante = ?,
-                celular_representante = ?,
+                tiene_hijos = ?,
+                nombre_hijos = ?,
+                edades_hijos = ?,
+                nombre_esposo = ?,
+                edad_esposo = ?,
+                grupo_sanguineo = ?,
+                semestre_academico = ?,
                 idioma_adicional = ?,
                 actividades_complementarias = ?,
                 nombre_padre = ?,
                 edad_padre = ?,
                 nombre_madre = ?,
                 edad_madre = ?,
-                nombre_hijos = ?,
-                edades_hijos = ?,
-                nombre_esposo = ?,
-                edad_esposo = ?,
                 enfermedades_generales = ?,
                 enfermedades_mentales = ?,
                 medicamentos = ?,
@@ -202,10 +193,8 @@ public class EstudianteRepository {
                 nucleo_familiar_tunja = ?
                 WHERE cedula = ?
                 """,
-                // ... parámetros igual que antes
-
                 e.getNombresCompletos(),
-                e.getApellidos(),
+                e.getApellidosCompletos(),
                 e.getProgramaAcademico(),
                 e.getInstitucionEducativa(),
                 e.getTipoVinculacion(),
@@ -221,9 +210,30 @@ public class EstudianteRepository {
                 e.getNombreRepresentante(),
                 e.getParentesco(),
                 e.getCelularRepresentante(),
+                e.getDireccionRepresentante(),
+                e.getCiudadRepresentante(),
                 e.getTieneHijos(),
+                e.getNombreHijos(),
+                e.getEdadesHijos(),
+                e.getNombreEsposo(),
+                e.getEdadEsposo(),
                 e.getGrupoSanguineo(),
                 e.getSemestreAcademico(),
+                e.getIdiomaAdicional(),
+                e.getActividadesComplementarias(),
+                e.getNombrePadre(),
+                e.getEdadPadre(),
+                e.getNombreMadre(),
+                e.getEdadMadre(),
+                e.getEnfermedadesGenerales(),
+                e.getEnfermedadesMentales(),
+                e.getMedicamentos(),
+                e.getAlergias(),
+                e.getPeso(),
+                e.getTalla(),
+                e.getImc(),
+                e.getCompanerosTunja(),
+                e.getNucleoFamiliarTunja(),
                 cedula);
     }
 }

@@ -37,7 +37,7 @@ public class PorteriaService {
                 // VALIDACIÓN 2 — ¿Completó la inducción hospitalaria?
                 if (e.getInduccionCompletada() == null || !e.getInduccionCompletada()) {
                         return ResultadoAcceso.rechazado(
-                                        e.getNombre() + " " + e.getApellido() +
+                                        e.getNombresCompletos() + " " + e.getApellidosCompletos() +
                                                         " no ha completado la inducción hospitalaria.");
                 }
 
@@ -76,7 +76,7 @@ public class PorteriaService {
                 // Si ya está dentro, bloquear doble ingreso
                 if (porteriaRepo.estudianteYaDentro(e.getIdEstudiante())) {
                         return ResultadoAcceso.rechazado(
-                                        e.getNombre() + " " + e.getApellido() +
+                                        e.getNombresCompletos() + " " + e.getApellidosCompletos() +
                                                         " ya tiene un ingreso activo sin salida registrada.");
                 }
 
@@ -93,7 +93,7 @@ public class PorteriaService {
                         return "Cédula no encontrada";
 
                 porteriaRepo.registrarSalida(opt.get().getIdEstudiante());
-                return "Salida registrada para " + opt.get().getNombre() +
-                                " " + opt.get().getApellido();
+                return "Salida registrada para " + opt.get().getNombresCompletos() +
+                                " " + opt.get().getApellidosCompletos();
         }
 }

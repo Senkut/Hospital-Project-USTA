@@ -31,7 +31,7 @@ public class EstudianteService {
     public String registrar(Estudiante e) {
         if (e.getCedula() == null || e.getCedula().isBlank())
             return "ERROR: La cédula es obligatoria";
-        if (e.getNombre() == null || e.getNombre().isBlank())
+        if (e.getNombresCompletos() == null || e.getNombresCompletos().isBlank())
             return "ERROR: El nombre es obligatorio";
         if (repo.existeCedula(e.getCedula()))
             return "ERROR: Ya existe un estudiante con cédula " + e.getCedula();

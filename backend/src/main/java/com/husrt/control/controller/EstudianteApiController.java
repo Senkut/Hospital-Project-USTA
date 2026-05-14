@@ -23,7 +23,7 @@ public class EstudianteApiController {
         return service.obtenerTodos().stream().map(e -> {
             Map<String, Object> m = new java.util.LinkedHashMap<>();
             m.put("id", e.getIdEstudiante());
-            m.put("name", e.getNombre() + " " + e.getApellido());
+            m.put("name", e.getNombresCompletos() + " " + e.getApellidosCompletos());
             m.put("cedula", e.getCedula());
             m.put("universidad", e.getIdUniversidad());
             m.put("programa", e.getProgramaAcademico());
@@ -47,7 +47,8 @@ public class EstudianteApiController {
 
         // Nombres — el frontend manda nombresCompletos y apellidos por separado
         String nombresCompletos = (String) datos.get("nombresCompletos");
-        String apellidos = (String) datos.get("apellidos");
+        String apellidosCompletos = (String) datos.getOrDefault("apellidosCompletos",
+                datos.get("apellidos"));
 
         // Compatibilidad con formato antiguo que manda "name" completo
         if (nombresCompletos == null || nombresCompletos.isBlank()) {
@@ -55,19 +56,12 @@ public class EstudianteApiController {
             if (nameCompleto != null) {
                 String[] partes = nameCompleto.split(" ", 2);
                 nombresCompletos = partes[0];
-                apellidos = partes.length > 1 ? partes[1] : "";
+                apellidosCompletos = partes.length > 1 ? partes[1] : "";
             }
         }
 
         e.setNombresCompletos(nombresCompletos);
-        e.setApellidos(apellidos);
-        // nombre y apellido son NOT NULL — usar primera palabra de cada campo
-        e.setNombre(nombresCompletos != null && !nombresCompletos.isBlank()
-                ? nombresCompletos.split(" ")[0]
-                : "Sin nombre");
-        e.setApellido(apellidos != null && !apellidos.isBlank()
-                ? apellidos.split(" ")[0]
-                : "Sin apellido");
+        e.setApellidosCompletos(apellidosCompletos);
 
         e.setCedula((String) datos.get("cedula"));
         e.setProgramaAcademico((String) datos.get("programa"));
@@ -130,21 +124,21 @@ public class EstudianteApiController {
         Object pesoObj = datos.get("peso");
         if (pesoObj != null && !pesoObj.toString().isBlank()) {
             try {
-                e.setPeso(new java.math.BigDecimal(pesoObj.toString()));
+                e.setPeso(Double.parseDouble(pesoObj.toString()));
             } catch (Exception ex) {
             }
         }
         Object tallaObj = datos.get("talla");
         if (tallaObj != null && !tallaObj.toString().isBlank()) {
             try {
-                e.setTalla(new java.math.BigDecimal(tallaObj.toString()));
+                e.setTalla(Double.parseDouble(tallaObj.toString()));
             } catch (Exception ex) {
             }
         }
         Object imcObj = datos.get("imc");
         if (imcObj != null && !imcObj.toString().isBlank()) {
             try {
-                e.setImc(new java.math.BigDecimal(imcObj.toString()));
+                e.setImc(Double.parseDouble(imcObj.toString()));
             } catch (Exception ex) {
             }
         }
@@ -191,6 +185,11 @@ public class EstudianteApiController {
             System.err.println("Error parseando fecha: " + ex.getMessage());
         }
 
+        // Asegurar id_universidad por defecto
+        if (e.getIdUniversidad() == null || e.getIdUniversidad() == 0) {
+            e.setIdUniversidad(1);
+        }
+
         String resultado = service.registrar(e);
         return Map.of("ok", resultado.equals("OK"), "mensaje", resultado);
     }
@@ -202,10 +201,10 @@ public class EstudianteApiController {
         try {
             Estudiante e = new Estudiante();
             e.setNombresCompletos((String) datos.get("nombresCompletos"));
-            e.setApellidos((String) datos.get("apellidos"));
+            e.setApellidosCompletos((String) datos.get("apellidosCompletos"));
 
             String nombresCompletos = (String) datos.get("nombresCompletos");
-            String apellidos = (String) datos.get("apellidos");
+            String apellidosCompletos = (String) datos.get("apellidosCompletos");
 
             // Compatibilidad con formato que manda "name" completo
             if (nombresCompletos == null || nombresCompletos.isBlank()) {
@@ -213,18 +212,12 @@ public class EstudianteApiController {
                 if (nameCompleto != null) {
                     String[] partes = nameCompleto.split(" ", 2);
                     nombresCompletos = partes[0];
-                    apellidos = partes.length > 1 ? partes[1] : "";
+                    apellidosCompletos = partes.length > 1 ? partes[1] : "";
                 }
             }
 
             e.setNombresCompletos(nombresCompletos);
-            e.setApellidos(apellidos);
-            e.setNombre(nombresCompletos != null && !nombresCompletos.isBlank()
-                    ? nombresCompletos.split(" ")[0]
-                    : "Sin nombre");
-            e.setApellido(apellidos != null && !apellidos.isBlank()
-                    ? apellidos.split(" ")[0]
-                    : "Sin apellido");
+            e.setApellidosCompletos(apellidosCompletos);
 
             e.setProgramaAcademico((String) datos.get("programa"));
             e.setInstitucionEducativa((String) datos.get("institucionEducativa"));

@@ -1,6 +1,5 @@
 package com.husrt.control.model;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class Estudiante {
@@ -17,9 +16,7 @@ public class Estudiante {
     private String cedula;
     private String tipoDocumento;
     private String nombresCompletos;
-    private String apellidos;
-    private String nombre; // mantener para compatibilidad
-    private String apellido; // mantener para compatibilidad
+    private String apellidosCompletos;
     private String estadoCivil;
     private LocalDate fechaNacimiento;
     private String lugarNacimiento;
@@ -58,9 +55,9 @@ public class Estudiante {
     private String enfermedadesMentales;
     private String medicamentos;
     private String alergias;
-    private BigDecimal peso;
-    private BigDecimal talla;
-    private BigDecimal imc;
+    private Double peso;
+    private Double talla;
+    private Double imc;
     private String grupoSanguineo;
 
     // Convivencia
@@ -70,7 +67,7 @@ public class Estudiante {
     // Datos académicos
     private Integer semestreAcademico;
     private Integer idUniversidad;
-    private BigDecimal promedioAcumulado;
+    private Double promedioAcumulado;
     private String investigacion;
     private LocalDate fechaIngresoProg;
     private String semestre;
@@ -150,28 +147,12 @@ public class Estudiante {
         this.nombresCompletos = v;
     }
 
-    public String getApellidos() {
-        return apellidos;
+    public String getApellidosCompletos() {
+        return apellidosCompletos;
     }
 
-    public void setApellidos(String v) {
-        this.apellidos = v;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String v) {
-        this.nombre = v;
-    }
-
-    public String getApellido() {
-        return apellido;
-    }
-
-    public void setApellido(String v) {
-        this.apellido = v;
+    public void setApellidosCompletos(String v) {
+        this.apellidosCompletos = v;
     }
 
     public String getEstadoCivil() {
@@ -398,27 +379,27 @@ public class Estudiante {
         this.alergias = v;
     }
 
-    public BigDecimal getPeso() {
+    public Double getPeso() {
         return peso;
     }
 
-    public void setPeso(BigDecimal v) {
+    public void setPeso(Double v) {
         this.peso = v;
     }
 
-    public BigDecimal getTalla() {
+    public Double getTalla() {
         return talla;
     }
 
-    public void setTalla(BigDecimal v) {
+    public void setTalla(Double v) {
         this.talla = v;
     }
 
-    public BigDecimal getImc() {
+    public Double getImc() {
         return imc;
     }
 
-    public void setImc(BigDecimal v) {
+    public void setImc(Double v) {
         this.imc = v;
     }
 
@@ -462,11 +443,11 @@ public class Estudiante {
         this.idUniversidad = v;
     }
 
-    public BigDecimal getPromedioAcumulado() {
+    public Double getPromedioAcumulado() {
         return promedioAcumulado;
     }
 
-    public void setPromedioAcumulado(BigDecimal v) {
+    public void setPromedioAcumulado(Double v) {
         this.promedioAcumulado = v;
     }
 

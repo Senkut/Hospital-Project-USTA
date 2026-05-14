@@ -17,7 +17,7 @@ public class ResultadoAcceso {
     public static ResultadoAcceso aprobado(Estudiante e, String servicio, String franja) {
         ResultadoAcceso r = new ResultadoAcceso();
         r.aprobado = true;
-        r.nombreEstudiante = e.getNombre() + " " + e.getApellido();
+        r.nombreEstudiante = e.getNombresCompletos() + " " + e.getApellidosCompletos();
         r.programa = e.getProgramaAcademico();
         r.servicio = servicio;
         r.franjaHoraria = franja;

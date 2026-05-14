@@ -78,9 +78,10 @@ interface StudentDashboardProps {
   student: Student;
   schedules: Schedule[];
   users: User[];
-  onCheckIn: (cedula: string) => boolean;
-  onCheckOut: (cedula: string) => void;
-  onUpdateStudent?: (id: string, data: Partial<Student>) => void;
+  // DESPUÉS
+  onCheckIn: (cedula: string) => boolean | Promise<boolean>;
+  onCheckOut: (cedula: string) => void | Promise<void>;
+  onUpdateStudent?: (id: string, data: Partial<Student>) => void | Promise<void>;
 }
 
 export function StudentDashboard({ student, schedules, users, onCheckIn, onCheckOut, onUpdateStudent }: StudentDashboardProps) {
@@ -93,7 +94,8 @@ export function StudentDashboard({ student, schedules, users, onCheckIn, onCheck
         </div>
       );
     }
-    return <CompleteProfileForm student={student} onUpdateStudent={onUpdateStudent} />;
+    if (!student) return null;
+    return <CompleteProfileForm student={student as any} onUpdateStudent={onUpdateStudent} />;
   }
 
   const [cedula, setCedula] = useState('');
@@ -130,7 +132,7 @@ export function StudentDashboard({ student, schedules, users, onCheckIn, onCheck
 
   const weekSchedules = getWeekSchedules();
 
-  const handleCheckIn = () => {
+  const handleCheckIn = async () => {
     if (!cedula) {
       toast.error('Por favor ingresa tu número de cédula');
       return;
@@ -141,7 +143,7 @@ export function StudentDashboard({ student, schedules, users, onCheckIn, onCheck
       return;
     }
 
-    const success = onCheckIn(cedula);
+    const success = await Promise.resolve(onCheckIn(cedula));
     if (success) {
       setCedula('');
     }
@@ -220,11 +222,10 @@ export function StudentDashboard({ student, schedules, users, onCheckIn, onCheck
         <div className="grid grid-cols-3 gap-2">
           <button
             onClick={() => setActiveTab('presencia')}
-            className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all ${
-              activeTab === 'presencia'
-                ? 'bg-gradient-to-r from-cyan-500 to-teal-500 text-white shadow-md'
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
+            className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all ${activeTab === 'presencia'
+              ? 'bg-gradient-to-r from-cyan-500 to-teal-500 text-white shadow-md'
+              : 'text-gray-600 hover:bg-gray-100'
+              }`}
           >
             <Activity className="w-5 h-5" />
             <span className="hidden md:inline">Panel de Presencia</span>
@@ -232,11 +233,10 @@ export function StudentDashboard({ student, schedules, users, onCheckIn, onCheck
           </button>
           <button
             onClick={() => setActiveTab('productividad')}
-            className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all ${
-              activeTab === 'productividad'
-                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md'
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
+            className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all ${activeTab === 'productividad'
+              ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md'
+              : 'text-gray-600 hover:bg-gray-100'
+              }`}
           >
             <BarChart3 className="w-5 h-5" />
             <span className="hidden md:inline">Productividad</span>
@@ -244,11 +244,10 @@ export function StudentDashboard({ student, schedules, users, onCheckIn, onCheck
           </button>
           <button
             onClick={() => setActiveTab('perfil')}
-            className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all ${
-              activeTab === 'perfil'
-                ? 'bg-gradient-to-r from-cyan-500 to-teal-500 text-white shadow-md'
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
+            className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all ${activeTab === 'perfil'
+              ? 'bg-gradient-to-r from-cyan-500 to-teal-500 text-white shadow-md'
+              : 'text-gray-600 hover:bg-gray-100'
+              }`}
           >
             <User className="w-5 h-5" />
             <span className="hidden md:inline">Mi Perfil</span>
@@ -262,264 +261,264 @@ export function StudentDashboard({ student, schedules, users, onCheckIn, onCheck
         <div className="space-y-6">
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-xl shadow-md border-2 border-cyan-100 p-6">
-          <div className="flex items-center justify-between mb-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-cyan-100 to-cyan-200 rounded-xl flex items-center justify-center">
-              <Calendar className="w-6 h-6 text-cyan-600" />
-            </div>
-            <span className="text-3xl font-bold text-cyan-600">{todaySchedules.length}</span>
-          </div>
-          <h3 className="text-gray-600 font-semibold">Turnos Hoy</h3>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-md border-2 border-teal-100 p-6">
-          <div className="flex items-center justify-between mb-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-teal-100 to-teal-200 rounded-xl flex items-center justify-center">
-              <Clock className="w-6 h-6 text-teal-600" />
-            </div>
-            <span className="text-3xl font-bold text-teal-600">{totalHorasEstaSemana.toFixed(1)}</span>
-          </div>
-          <h3 className="text-gray-600 font-semibold">Horas Esta Semana</h3>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-md border-2 border-blue-100 p-6">
-          <div className="flex items-center justify-between mb-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center">
-              <FileText className="w-6 h-6 text-blue-600" />
-            </div>
-            <span className="text-3xl font-bold text-blue-600">{mySchedules.length}</span>
-          </div>
-          <h3 className="text-gray-600 font-semibold">Total Turnos</h3>
-        </div>
-      </div>
-
-      {/* Panel de Registro de Presencia */}
-      <div className="bg-white rounded-xl shadow-lg border-2 border-cyan-100 p-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-          <LogIn className="w-6 h-6 text-cyan-600" />
-          Registro de Entrada/Salida
-        </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="border-2 border-gray-200 rounded-xl p-6 bg-gradient-to-br from-gray-50 to-white">
-            <div className="mb-4">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Ingresa tu Cédula para Registrar
-              </label>
-              <input
-                type="text"
-                value={cedula}
-                onChange={(e) => setCedula(e.target.value.replace(/[^0-9]/g, ''))}
-                placeholder="Número de cédula"
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-center text-lg font-semibold"
-                maxLength={12}
-              />
+            <div className="bg-white rounded-xl shadow-md border-2 border-cyan-100 p-6">
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-cyan-100 to-cyan-200 rounded-xl flex items-center justify-center">
+                  <Calendar className="w-6 h-6 text-cyan-600" />
+                </div>
+                <span className="text-3xl font-bold text-cyan-600">{todaySchedules.length}</span>
+              </div>
+              <h3 className="text-gray-600 font-semibold">Turnos Hoy</h3>
             </div>
 
-            <div className="flex gap-3">
-              <button
-                onClick={handleCheckIn}
-                disabled={student.checkInTime && !student.checkOutTime}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all shadow-md font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <LogIn className="w-5 h-5" />
-                Entrada
-              </button>
+            <div className="bg-white rounded-xl shadow-md border-2 border-teal-100 p-6">
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-teal-100 to-teal-200 rounded-xl flex items-center justify-center">
+                  <Clock className="w-6 h-6 text-teal-600" />
+                </div>
+                <span className="text-3xl font-bold text-teal-600">{totalHorasEstaSemana.toFixed(1)}</span>
+              </div>
+              <h3 className="text-gray-600 font-semibold">Horas Esta Semana</h3>
+            </div>
 
-              <button
-                onClick={handleCheckOut}
-                disabled={!student.checkInTime || student.checkOutTime}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-lg hover:from-red-600 hover:to-rose-600 transition-all shadow-md font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <LogOut className="w-5 h-5" />
-                Salida
-              </button>
+            <div className="bg-white rounded-xl shadow-md border-2 border-blue-100 p-6">
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center">
+                  <FileText className="w-6 h-6 text-blue-600" />
+                </div>
+                <span className="text-3xl font-bold text-blue-600">{mySchedules.length}</span>
+              </div>
+              <h3 className="text-gray-600 font-semibold">Total Turnos</h3>
             </div>
           </div>
 
-          <div className="border-2 border-cyan-200 rounded-xl p-6 bg-gradient-to-br from-cyan-50 to-teal-50">
-            <h3 className="text-sm font-bold text-gray-700 mb-4">Registro de Hoy</h3>
-            <div className="space-y-3">
-              {todaySchedules.length > 0 ? (
-                <div className="p-3 bg-blue-100 rounded-lg border border-blue-300 mb-2">
-                  <div className="text-xs font-semibold text-blue-800 mb-1">⏰ Horario Programado</div>
-                  <div className="text-sm font-bold text-blue-900">
-                    {todaySchedules[0].startTime} - {todaySchedules[0].endTime}
-                  </div>
-                  <div className="text-xs text-blue-700 mt-1">
-                    Área: {todaySchedules[0].area}
-                  </div>
-                </div>
-              ) : (
-                <div className="p-3 bg-gray-100 rounded-lg border border-gray-300 mb-2">
-                  <div className="text-xs font-semibold text-gray-600 mb-1">📋 Horario Programado</div>
-                  <div className="text-sm text-gray-500">
-                    No tienes horario asignado para hoy
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1">
-                    Aún puedes registrar tu asistencia
-                  </div>
-                </div>
-              )}
-              {student.checkInTime && (
-                <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-green-200">
-                  <div>
-                    <span className="text-sm font-medium text-gray-600">Entrada Real:</span>
-                    {todaySchedules.length > 0 ? (
-                      <>
-                        {student.checkInTime > todaySchedules[0].startTime && (
-                          <div className="text-xs text-red-600 font-medium mt-1">⚠️ Llegaste tarde</div>
-                        )}
-                        {student.checkInTime <= todaySchedules[0].startTime && (
-                          <div className="text-xs text-green-600 font-medium mt-1">✓ A tiempo</div>
-                        )}
-                      </>
-                    ) : (
-                      <div className="text-xs text-gray-500 font-medium mt-1">Sin horario programado</div>
-                    )}
-                  </div>
-                  <span className="text-lg font-bold text-green-600">{student.checkInTime}</span>
-                </div>
-              )}
-              {student.checkOutTime && (
-                <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-orange-200">
-                  <div>
-                    <span className="text-sm font-medium text-gray-600">Salida Real:</span>
-                    {todaySchedules.length > 0 ? (
-                      <>
-                        {student.checkOutTime < todaySchedules[0].endTime && (
-                          <div className="text-xs text-red-600 font-medium mt-1">⚠️ Saliste temprano</div>
-                        )}
-                        {student.checkOutTime >= todaySchedules[0].endTime && (
-                          <div className="text-xs text-green-600 font-medium mt-1">✓ Completaste el turno</div>
-                        )}
-                      </>
-                    ) : (
-                      <div className="text-xs text-gray-500 font-medium mt-1">Sin horario programado</div>
-                    )}
-                  </div>
-                  <span className="text-lg font-bold text-orange-600">{student.checkOutTime}</span>
-                </div>
-              )}
-              {!student.checkInTime && (
-                <div className="text-center py-4 text-gray-500">
-                  <p className="text-sm">Aún no has registrado tu entrada hoy</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+          {/* Panel de Registro de Presencia */}
+          <div className="bg-white rounded-xl shadow-lg border-2 border-cyan-100 p-6">
+            <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+              <LogIn className="w-6 h-6 text-cyan-600" />
+              Registro de Entrada/Salida
+            </h2>
 
-      {/* Mi Horario */}
-      <div className="bg-white rounded-xl shadow-lg border-2 border-cyan-100 p-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-          <Calendar className="w-6 h-6 text-cyan-600" />
-          Mi Horario
-        </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="border-2 border-gray-200 rounded-xl p-6 bg-gradient-to-br from-gray-50 to-white">
+                <div className="mb-4">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Ingresa tu Cédula para Registrar
+                  </label>
+                  <input
+                    type="text"
+                    value={cedula}
+                    onChange={(e) => setCedula(e.target.value.replace(/[^0-9]/g, ''))}
+                    placeholder="Número de cédula"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-center text-lg font-semibold"
+                    maxLength={12}
+                  />
+                </div>
 
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Horarios de Hoy</h3>
-          {todaySchedules.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {todaySchedules.map((schedule) => {
-                const doctor = users.find(u => u.id === schedule.doctorId);
-                return (
-                  <div key={schedule.id} className="border-l-4 border-cyan-500 bg-gradient-to-r from-cyan-50 to-white p-4 rounded-lg shadow-sm">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-bold text-gray-800">{schedule.area}</span>
-                      <span className="text-xs bg-cyan-100 text-cyan-700 px-2 py-1 rounded-full font-semibold">
-                        {schedule.startTime} - {schedule.endTime}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600">Supervisor: {doctor?.name}</p>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="text-center py-8 text-gray-500">
-              <p>No tienes turnos programados para hoy</p>
-            </div>
-          )}
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleCheckIn}
+                    disabled={!!(student.checkInTime && !student.checkOutTime)}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all shadow-md font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <LogIn className="w-5 h-5" />
+                    Entrada
+                  </button>
 
-          <h3 className="text-lg font-semibold text-gray-700 border-b pb-2 mt-6">Próximos Turnos</h3>
-          {mySchedules.filter(s => new Date(s.fecha) > new Date()).length > 0 ? (
-            <div className="space-y-3">
-              {mySchedules
-                .filter(s => new Date(s.fecha) > new Date())
-                .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime())
-                .slice(0, 5)
-                .map((schedule) => {
-                  const doctor = users.find(u => u.id === schedule.doctorId);
-                  return (
-                    <div key={schedule.id} className="border border-gray-200 bg-white p-4 rounded-lg hover:shadow-md transition-shadow">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <span className="font-bold text-gray-800">{schedule.area}</span>
-                          <p className="text-sm text-gray-600">Supervisor: {doctor?.name}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-semibold text-cyan-600">
-                            {new Date(schedule.fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                          </p>
-                          <p className="text-xs text-gray-500">{schedule.startTime} - {schedule.endTime}</p>
-                        </div>
+                  <button
+                    onClick={handleCheckOut}
+                    disabled={!student.checkInTime || !!student.checkOutTime}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-lg hover:from-red-600 hover:to-rose-600 transition-all shadow-md font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    Salida
+                  </button>
+                </div>
+              </div>
+
+              <div className="border-2 border-cyan-200 rounded-xl p-6 bg-gradient-to-br from-cyan-50 to-teal-50">
+                <h3 className="text-sm font-bold text-gray-700 mb-4">Registro de Hoy</h3>
+                <div className="space-y-3">
+                  {todaySchedules.length > 0 ? (
+                    <div className="p-3 bg-blue-100 rounded-lg border border-blue-300 mb-2">
+                      <div className="text-xs font-semibold text-blue-800 mb-1">⏰ Horario Programado</div>
+                      <div className="text-sm font-bold text-blue-900">
+                        {todaySchedules[0].startTime} - {todaySchedules[0].endTime}
+                      </div>
+                      <div className="text-xs text-blue-700 mt-1">
+                        Área: {todaySchedules[0].area}
                       </div>
                     </div>
-                  );
-                })}
-            </div>
-          ) : (
-            <div className="text-center py-8 text-gray-500">
-              <p>No tienes turnos próximos programados</p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Mi Reporte de Productividad */}
-      <div className="bg-white rounded-xl shadow-lg border-2 border-cyan-100 p-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-          <FileText className="w-6 h-6 text-cyan-600" />
-          Mi Reporte de Productividad
-        </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="border border-gray-200 rounded-lg p-4 bg-gradient-to-br from-blue-50 to-white">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Resumen del Mes</h3>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Días asistidos:</span>
-                <span className="font-bold text-blue-600">-</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Horas completadas:</span>
-                <span className="font-bold text-blue-600">{totalHorasEstaSemana.toFixed(1)}h</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Áreas rotadas:</span>
-                <span className="font-bold text-blue-600">{new Set(mySchedules.map(s => s.area)).size}</span>
+                  ) : (
+                    <div className="p-3 bg-gray-100 rounded-lg border border-gray-300 mb-2">
+                      <div className="text-xs font-semibold text-gray-600 mb-1">📋 Horario Programado</div>
+                      <div className="text-sm text-gray-500">
+                        No tienes horario asignado para hoy
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        Aún puedes registrar tu asistencia
+                      </div>
+                    </div>
+                  )}
+                  {student.checkInTime && (
+                    <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-green-200">
+                      <div>
+                        <span className="text-sm font-medium text-gray-600">Entrada Real:</span>
+                        {todaySchedules.length > 0 ? (
+                          <>
+                            {student.checkInTime > todaySchedules[0].startTime && (
+                              <div className="text-xs text-red-600 font-medium mt-1">⚠️ Llegaste tarde</div>
+                            )}
+                            {student.checkInTime <= todaySchedules[0].startTime && (
+                              <div className="text-xs text-green-600 font-medium mt-1">✓ A tiempo</div>
+                            )}
+                          </>
+                        ) : (
+                          <div className="text-xs text-gray-500 font-medium mt-1">Sin horario programado</div>
+                        )}
+                      </div>
+                      <span className="text-lg font-bold text-green-600">{student.checkInTime}</span>
+                    </div>
+                  )}
+                  {student.checkOutTime && (
+                    <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-orange-200">
+                      <div>
+                        <span className="text-sm font-medium text-gray-600">Salida Real:</span>
+                        {todaySchedules.length > 0 ? (
+                          <>
+                            {student.checkOutTime < todaySchedules[0].endTime && (
+                              <div className="text-xs text-red-600 font-medium mt-1">⚠️ Saliste temprano</div>
+                            )}
+                            {student.checkOutTime >= todaySchedules[0].endTime && (
+                              <div className="text-xs text-green-600 font-medium mt-1">✓ Completaste el turno</div>
+                            )}
+                          </>
+                        ) : (
+                          <div className="text-xs text-gray-500 font-medium mt-1">Sin horario programado</div>
+                        )}
+                      </div>
+                      <span className="text-lg font-bold text-orange-600">{student.checkOutTime}</span>
+                    </div>
+                  )}
+                  {!student.checkInTime && (
+                    <div className="text-center py-4 text-gray-500">
+                      <p className="text-sm">Aún no has registrado tu entrada hoy</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="border border-gray-200 rounded-lg p-4 bg-gradient-to-br from-green-50 to-white">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Áreas de Rotación</h3>
-            <div className="space-y-2">
-              {Array.from(new Set(mySchedules.map(s => s.area))).map((area, idx) => (
-                <div key={idx} className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm text-gray-700">{area}</span>
+          {/* Mi Horario */}
+          <div className="bg-white rounded-xl shadow-lg border-2 border-cyan-100 p-6">
+            <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+              <Calendar className="w-6 h-6 text-cyan-600" />
+              Mi Horario
+            </h2>
+
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Horarios de Hoy</h3>
+              {todaySchedules.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {todaySchedules.map((schedule) => {
+                    const doctor = users.find(u => u.id === schedule.doctorId);
+                    return (
+                      <div key={schedule.id} className="border-l-4 border-cyan-500 bg-gradient-to-r from-cyan-50 to-white p-4 rounded-lg shadow-sm">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-bold text-gray-800">{schedule.area}</span>
+                          <span className="text-xs bg-cyan-100 text-cyan-700 px-2 py-1 rounded-full font-semibold">
+                            {schedule.startTime} - {schedule.endTime}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-600">Supervisor: {doctor?.name}</p>
+                      </div>
+                    );
+                  })}
                 </div>
-              ))}
-              {mySchedules.length === 0 && (
-                <p className="text-sm text-gray-500">Sin rotaciones asignadas</p>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <p>No tienes turnos programados para hoy</p>
+                </div>
+              )}
+
+              <h3 className="text-lg font-semibold text-gray-700 border-b pb-2 mt-6">Próximos Turnos</h3>
+              {mySchedules.filter(s => new Date(s.fecha) > new Date()).length > 0 ? (
+                <div className="space-y-3">
+                  {mySchedules
+                    .filter(s => new Date(s.fecha) > new Date())
+                    .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime())
+                    .slice(0, 5)
+                    .map((schedule) => {
+                      const doctor = users.find(u => u.id === schedule.doctorId);
+                      return (
+                        <div key={schedule.id} className="border border-gray-200 bg-white p-4 rounded-lg hover:shadow-md transition-shadow">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <span className="font-bold text-gray-800">{schedule.area}</span>
+                              <p className="text-sm text-gray-600">Supervisor: {doctor?.name}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-semibold text-cyan-600">
+                                {new Date(schedule.fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                              </p>
+                              <p className="text-xs text-gray-500">{schedule.startTime} - {schedule.endTime}</p>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <p>No tienes turnos próximos programados</p>
+                </div>
               )}
             </div>
           </div>
-        </div>
-      </div>
+
+          {/* Mi Reporte de Productividad */}
+          <div className="bg-white rounded-xl shadow-lg border-2 border-cyan-100 p-6">
+            <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+              <FileText className="w-6 h-6 text-cyan-600" />
+              Mi Reporte de Productividad
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="border border-gray-200 rounded-lg p-4 bg-gradient-to-br from-blue-50 to-white">
+                <h3 className="text-sm font-semibold text-gray-700 mb-3">Resumen del Mes</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Días asistidos:</span>
+                    <span className="font-bold text-blue-600">-</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Horas completadas:</span>
+                    <span className="font-bold text-blue-600">{totalHorasEstaSemana.toFixed(1)}h</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Áreas rotadas:</span>
+                    <span className="font-bold text-blue-600">{new Set(mySchedules.map(s => s.area)).size}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border border-gray-200 rounded-lg p-4 bg-gradient-to-br from-green-50 to-white">
+                <h3 className="text-sm font-semibold text-gray-700 mb-3">Áreas de Rotación</h3>
+                <div className="space-y-2">
+                  {Array.from(new Set(mySchedules.map(s => s.area))).map((area, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-sm text-gray-700">{area}</span>
+                    </div>
+                  ))}
+                  {mySchedules.length === 0 && (
+                    <p className="text-sm text-gray-500">Sin rotaciones asignadas</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -695,7 +694,7 @@ export function StudentDashboard({ student, schedules, users, onCheckIn, onCheck
       {/* Modal de Editar Perfil */}
       {showEditProfile && onUpdateStudent && (
         <EditProfileForm
-          student={student}
+          student={student as any}
           onUpdateStudent={onUpdateStudent}
           onClose={() => setShowEditProfile(false)}
         />
