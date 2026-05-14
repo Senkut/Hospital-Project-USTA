@@ -23,19 +23,60 @@ public class EstudianteApiController {
         return service.obtenerTodos().stream().map(e -> {
             Map<String, Object> m = new java.util.LinkedHashMap<>();
             m.put("id", e.getIdEstudiante());
-            m.put("name", e.getNombresCompletos() + " " + e.getApellidosCompletos());
             m.put("cedula", e.getCedula());
-            m.put("universidad", e.getIdUniversidad());
+            m.put("name", e.getNombresCompletos() + " " + e.getApellidosCompletos());
+            m.put("nombresCompletos", e.getNombresCompletos());
+            m.put("apellidosCompletos", e.getApellidosCompletos());
             m.put("programa", e.getProgramaAcademico());
+            m.put("institucionEducativa", e.getInstitucionEducativa());
+            m.put("tipoVinculacion", e.getTipoVinculacion());
+            m.put("tipoDocumento", e.getTipoDocumento());
+            m.put("estadoCivil", e.getEstadoCivil());
+            m.put("fechaNacimiento", e.getFechaNacimiento());
+            m.put("lugarNacimiento", e.getLugarNacimiento());
+            m.put("genero", e.getGenero() != null ? e.getGenero() : "masculino");
+            m.put("celular", e.getCelular() != null ? e.getCelular() : "");
+            m.put("email", e.getEmail() != null ? e.getEmail() : "");
+            m.put("direccionTunja", e.getDireccionTunja() != null ? e.getDireccionTunja() : "");
+            m.put("lugarResidenciaPermanente",
+                    e.getLugarResidenciaPermanente() != null ? e.getLugarResidenciaPermanente() : "");
+            m.put("direccionRepresentante", e.getDireccionRepresentante() != null ? e.getDireccionRepresentante() : "");
+            m.put("ciudadRepresentante", e.getCiudadRepresentante() != null ? e.getCiudadRepresentante() : "");
+            m.put("nombreRepresentante", e.getNombreRepresentante() != null ? e.getNombreRepresentante() : "");
+            m.put("parentesco", e.getParentesco() != null ? e.getParentesco() : "");
+            m.put("celularRepresentante", e.getCelularRepresentante() != null ? e.getCelularRepresentante() : "");
+            m.put("idiomaAdicional", e.getIdiomaAdicional());
+            m.put("actividadesComplementarias", e.getActividadesComplementarias());
+            m.put("nombrePadre", e.getNombrePadre());
+            m.put("edadPadre", e.getEdadPadre());
+            m.put("nombreMadre", e.getNombreMadre());
+            m.put("edadMadre", e.getEdadMadre());
+            m.put("tieneHijos", Boolean.TRUE.equals(e.getTieneHijos()));
+            m.put("nombreHijos", e.getNombreHijos());
+            m.put("edadesHijos", e.getEdadesHijos());
+            m.put("nombreEsposo", e.getNombreEsposo());
+            m.put("edadEsposo", e.getEdadEsposo());
+            m.put("enfermedadesGenerales", e.getEnfermedadesGenerales());
+            m.put("enfermedadesMentales", e.getEnfermedadesMentales());
+            m.put("medicamentos", e.getMedicamentos());
+            m.put("alergias", e.getAlergias());
+            m.put("peso", e.getPeso());
+            m.put("talla", e.getTalla());
+            m.put("imc", e.getImc());
+            m.put("grupoSanguineo", e.getGrupoSanguineo());
+            m.put("companerosTunja", e.getCompanerosTunja());
+            m.put("nucleoFamiliarTunja", e.getNucleoFamiliarTunja());
             m.put("semestre", e.getSemestreAcademico());
+            m.put("universidad", e.getInstitucionEducativa()); // nombre, no ID
+            m.put("idUniversidad", e.getIdUniversidad());
             m.put("estado", e.getEstado() != null ? e.getEstado().toUpperCase() : "ACTIVO");
             m.put("induccionHospitalaria", Boolean.TRUE.equals(e.getInduccionCompletada()));
             m.put("fechaInduccion", e.getFechaInduccion());
-            m.put("arl", e.getArlVigenciaFin() != null &&
-                    e.getArlVigenciaFin().isAfter(java.time.LocalDate.now()));
-            m.put("fechaARL", e.getArlVigenciaFin());
-            m.put("genero", "masculino");
-            m.put("email", "");
+            m.put("arl", e.getArlVigenciaInicio() != null &&
+                    e.getArlVigenciaInicio().isAfter(java.time.LocalDate.now()));
+            m.put("fechaARL", e.getArlVigenciaInicio());
+            m.put("password", e.getPassword());
+            m.put("foto", e.getFotoUrl());
             return m;
         }).collect(java.util.stream.Collectors.toList());
     }
@@ -47,8 +88,7 @@ public class EstudianteApiController {
 
         // Nombres — el frontend manda nombresCompletos y apellidos por separado
         String nombresCompletos = (String) datos.get("nombresCompletos");
-        String apellidosCompletos = (String) datos.getOrDefault("apellidosCompletos",
-                datos.get("apellidos"));
+        String apellidosCompletos = (String) datos.get("apellidosCompletos");
 
         // Compatibilidad con formato antiguo que manda "name" completo
         if (nombresCompletos == null || nombresCompletos.isBlank()) {
@@ -92,6 +132,9 @@ public class EstudianteApiController {
         e.setNombreHijos((String) datos.get("nombreHijos"));
         e.setEdadesHijos((String) datos.get("edadesHijos"));
         e.setNombreEsposo((String) datos.get("nombreEsposo"));
+
+        // contraseña
+        e.setPassword((String) datos.get("password"));
 
         Object edadPadreObj = datos.get("edadPadre");
         if (edadPadreObj != null && !edadPadreObj.toString().isBlank()) {
@@ -172,7 +215,7 @@ public class EstudianteApiController {
         try {
             String fechaARL = (String) datos.get("fechaARL");
             if (fechaARL != null && !fechaARL.isBlank())
-                e.setArlVigenciaFin(java.time.LocalDate.parse(fechaARL));
+                e.setArlVigenciaInicio(java.time.LocalDate.parse(fechaARL));
 
             String fechaInd = (String) datos.get("fechaInduccion");
             if (fechaInd != null && !fechaInd.isBlank())
@@ -185,8 +228,17 @@ public class EstudianteApiController {
             System.err.println("Error parseando fecha: " + ex.getMessage());
         }
 
-        // Asegurar id_universidad por defecto
-        if (e.getIdUniversidad() == null || e.getIdUniversidad() == 0) {
+        String institucion = e.getInstitucionEducativa();
+        if (institucion != null) {
+            int idUniv = switch (institucion) {
+                case "Universidad Santo Tomás" -> 1;
+                case "Universidad Pedagógica y Tecnológica de Colombia" -> 2;
+                case "Universidad de Boyacá" -> 3;
+                case "Fundación Universitaria Juan de Castellanos" -> 4;
+                default -> 1;
+            };
+            e.setIdUniversidad(idUniv);
+        } else {
             e.setIdUniversidad(1);
         }
 
@@ -200,13 +252,10 @@ public class EstudianteApiController {
             @RequestBody Map<String, Object> datos) {
         try {
             Estudiante e = new Estudiante();
-            e.setNombresCompletos((String) datos.get("nombresCompletos"));
-            e.setApellidosCompletos((String) datos.get("apellidosCompletos"));
 
+            // Nombres
             String nombresCompletos = (String) datos.get("nombresCompletos");
             String apellidosCompletos = (String) datos.get("apellidosCompletos");
-
-            // Compatibilidad con formato que manda "name" completo
             if (nombresCompletos == null || nombresCompletos.isBlank()) {
                 String nameCompleto = (String) datos.get("name");
                 if (nameCompleto != null) {
@@ -215,44 +264,121 @@ public class EstudianteApiController {
                     apellidosCompletos = partes.length > 1 ? partes[1] : "";
                 }
             }
-
             e.setNombresCompletos(nombresCompletos);
             e.setApellidosCompletos(apellidosCompletos);
 
+            // Académico
             e.setProgramaAcademico((String) datos.get("programa"));
             e.setInstitucionEducativa((String) datos.get("institucionEducativa"));
             e.setTipoVinculacion((String) datos.get("tipoVinculacion"));
+
+            // Personal
             e.setTipoDocumento((String) datos.get("tipoDocumento"));
             e.setEstadoCivil((String) datos.get("estadoCivil"));
             e.setGenero((String) datos.get("genero"));
+            e.setLugarNacimiento((String) datos.get("lugarNacimiento"));
+            e.setFotoUrl((String) datos.get("foto"));
+
+            // Contacto
             e.setCelular((String) datos.get("celular"));
             e.setEmail((String) datos.get("email"));
             e.setDireccionTunja((String) datos.get("direccionTunja"));
-            e.setLugarNacimiento((String) datos.get("lugarNacimiento"));
+            e.setLugarResidenciaPermanente((String) datos.get("lugarResidenciaPermanente"));
+
+            // Representante
             e.setNombreRepresentante((String) datos.get("nombreRepresentante"));
             e.setParentesco((String) datos.get("parentesco"));
+            e.setCelularRepresentante((String) datos.get("celularRepresentante"));
+            e.setDireccionRepresentante((String) datos.get("direccionRepresentante"));
+            e.setCiudadRepresentante((String) datos.get("ciudadRepresentante"));
+
+            // Complementarios
             e.setGrupoSanguineo((String) datos.get("grupoSanguineo"));
+            e.setIdiomaAdicional((String) datos.get("idiomaAdicional"));
+            e.setActividadesComplementarias((String) datos.get("actividadesComplementarias"));
+
+            // Familia
+            e.setNombrePadre((String) datos.get("nombrePadre"));
+            e.setNombreMadre((String) datos.get("nombreMadre"));
+            e.setNombreHijos((String) datos.get("nombreHijos"));
+            e.setEdadesHijos((String) datos.get("edadesHijos"));
+            e.setNombreEsposo((String) datos.get("nombreEsposo"));
             e.setTieneHijos(Boolean.TRUE.equals(datos.get("tieneHijos")));
 
+            Object edadPadreObj = datos.get("edadPadre");
+            if (edadPadreObj != null && !edadPadreObj.toString().isBlank()) {
+                try {
+                    e.setEdadPadre(Integer.parseInt(edadPadreObj.toString()));
+                } catch (NumberFormatException ignored) {
+                }
+            }
+            Object edadMadreObj = datos.get("edadMadre");
+            if (edadMadreObj != null && !edadMadreObj.toString().isBlank()) {
+                try {
+                    e.setEdadMadre(Integer.parseInt(edadMadreObj.toString()));
+                } catch (NumberFormatException ignored) {
+                }
+            }
+            Object edadEsosoObj = datos.get("edadEsposo");
+            if (edadEsosoObj != null && !edadEsosoObj.toString().isBlank()) {
+                try {
+                    e.setEdadEsposo(Integer.parseInt(edadEsosoObj.toString()));
+                } catch (NumberFormatException ignored) {
+                }
+            }
+
+            // Salud
+            e.setEnfermedadesGenerales((String) datos.get("enfermedadesGenerales"));
+            e.setEnfermedadesMentales((String) datos.get("enfermedadesMentales"));
+            e.setMedicamentos((String) datos.get("medicamentos"));
+            e.setAlergias((String) datos.get("alergias"));
+
+            Object pesoObj = datos.get("peso");
+            if (pesoObj != null && !pesoObj.toString().isBlank()) {
+                try {
+                    e.setPeso(Double.parseDouble(pesoObj.toString()));
+                } catch (Exception ignored) {
+                }
+            }
+            Object tallaObj = datos.get("talla");
+            if (tallaObj != null && !tallaObj.toString().isBlank()) {
+                try {
+                    e.setTalla(Double.parseDouble(tallaObj.toString()));
+                } catch (Exception ignored) {
+                }
+            }
+            Object imcObj = datos.get("imc");
+            if (imcObj != null && !imcObj.toString().isBlank()) {
+                try {
+                    e.setImc(Double.parseDouble(imcObj.toString()));
+                } catch (Exception ignored) {
+                }
+            }
+
+            // Convivencia
+            e.setCompanerosTunja((String) datos.get("companerosTunja"));
+            e.setNucleoFamiliarTunja((String) datos.get("nucleoFamiliarTunja"));
+
+            // Semestre
             Object sem = datos.get("semestre");
             if (sem != null && !sem.toString().isBlank()) {
                 try {
                     e.setSemestreAcademico(Integer.parseInt(sem.toString()));
-                } catch (NumberFormatException ex) {
-                    e.setSemestreAcademico(null);
+                } catch (NumberFormatException ignored) {
                 }
             }
 
-            // Fechas opcionales
+            // Booleanos de requisitos
+            e.setInduccionCompletada(Boolean.TRUE.equals(datos.get("induccionHospitalaria")));
+
+            // Fechas
             try {
                 String fechaARL = (String) datos.get("fechaARL");
                 if (fechaARL != null && !fechaARL.isBlank())
-                    e.setArlVigenciaFin(java.time.LocalDate.parse(fechaARL));
-
+                    e.setArlVigenciaInicio(java.time.LocalDate.parse(fechaARL));
                 String fechaInd = (String) datos.get("fechaInduccion");
                 if (fechaInd != null && !fechaInd.isBlank())
                     e.setFechaInduccion(java.time.LocalDate.parse(fechaInd));
-
                 String fechaNac = (String) datos.get("fechaNacimiento");
                 if (fechaNac != null && !fechaNac.isBlank())
                     e.setFechaNacimiento(java.time.LocalDate.parse(fechaNac));
@@ -260,12 +386,35 @@ public class EstudianteApiController {
                 System.err.println("Error parseando fecha en PATCH: " + ex.getMessage());
             }
 
+            // id_universidad — igual que en el POST
+            String institucion = e.getInstitucionEducativa();
+            if (institucion != null) {
+                int idUniv = switch (institucion) {
+                    case "Universidad Santo Tomás" -> 1;
+                    case "Universidad Pedagógica y Tecnológica de Colombia" -> 2;
+                    case "Universidad de Boyacá" -> 3;
+                    case "Fundación Universitaria Juan de Castellanos" -> 4;
+                    default -> 1;
+                };
+                e.setIdUniversidad(idUniv);
+            } else {
+                e.setIdUniversidad(1);
+            }
+
+            // Password — solo actualizar si viene en el request
+            Object pwObj = datos.get("password");
+            if (pwObj != null && !pwObj.toString().isBlank()) {
+                e.setPassword(pwObj.toString());
+            }
+            // Si es null, el Repository lo leerá de la BD y lo preservará
+
             service.actualizar(cedula, e);
             return ResponseEntity.ok(Map.of("ok", true, "mensaje", "Estudiante actualizado"));
 
         } catch (Exception ex) {
             ex.printStackTrace();
-            return ResponseEntity.status(500).body(Map.of("ok", false, "error", ex.getMessage()));
+            return ResponseEntity.status(500)
+                    .body(Map.of("ok", false, "error", ex.getMessage()));
         }
     }
 

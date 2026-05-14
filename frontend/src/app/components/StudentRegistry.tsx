@@ -14,7 +14,7 @@ interface Student {
   // Información Personal
   foto?: string;
   nombresCompletos: string;
-  apellidos: string;
+  apellidosCompletos: string;
   cedula: string;
   tipoDocumento: 'C.C.' | 'C.E.' | 'Pasaporte' | 'NIT' | 'Otro';
   estadoCivil: 'Soltero(a)' | 'Casado(a)' | 'Unión Libre' | 'Divorciado(a)' | 'Viudo(a)';
@@ -97,7 +97,7 @@ export function StudentRegistry({ students, onAddStudent, onUpdateStudent }: Stu
     // Información Personal
     foto: '',
     nombresCompletos: '',
-    apellidos: '',
+    apellidosCompletos: '',
     cedula: '',
     tipoDocumento: 'C.C.' as 'C.C.' | 'C.E.' | 'Pasaporte' | 'NIT' | 'Otro',
     estadoCivil: 'Soltero(a)' as 'Soltero(a)' | 'Casado(a)' | 'Unión Libre' | 'Divorciado(a)' | 'Viudo(a)',
@@ -161,7 +161,12 @@ export function StudentRegistry({ students, onAddStudent, onUpdateStudent }: Stu
 
     const studentData: any = {
       ...formData,
-      name: `${formData.nombresCompletos} ${formData.apellidos}`,
+      apellidosCompletos: formData.apellidosCompletos,           // renombrar
+      direccionRepresentante: formData.direccionRepresentanteLegal,   // renombrar
+      ciudadRepresentante: formData.ciudadRepresentanteLegal,         // renombrar
+      nombreRepresentante: formData.nombreRepresentanteLegal,         // renombrar
+      celularRepresentante: formData.celularRepresentanteLegal,       // renombrar
+      name: `${formData.nombresCompletos} ${formData.apellidosCompletos}`,
       universidad: formData.institucionEducativa
     };
 
@@ -190,7 +195,7 @@ export function StudentRegistry({ students, onAddStudent, onUpdateStudent }: Stu
       tipoVinculacion: 'Estudiante en práctica',
       foto: '',
       nombresCompletos: '',
-      apellidos: '',
+      apellidosCompletos: '',
       cedula: '',
       tipoDocumento: 'C.C.',
       estadoCivil: 'Soltero(a)',
@@ -243,7 +248,7 @@ export function StudentRegistry({ students, onAddStudent, onUpdateStudent }: Stu
       tipoVinculacion: student.tipoVinculacion,
       foto: student.foto || '',
       nombresCompletos: student.nombresCompletos,
-      apellidos: student.apellidos,
+      apellidosCompletos: student.apellidosCompletos,
       cedula: student.cedula,
       tipoDocumento: student.tipoDocumento,
       estadoCivil: student.estadoCivil,
@@ -447,8 +452,8 @@ export function StudentRegistry({ students, onAddStudent, onUpdateStudent }: Stu
                   <input
                     type="text"
                     required
-                    value={formData.apellidos}
-                    onChange={(e) => setFormData({ ...formData, apellidos: e.target.value })}
+                    value={formData.apellidosCompletos}
+                    onChange={(e) => setFormData({ ...formData, apellidosCompletos: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   />
                 </div>
@@ -1061,9 +1066,8 @@ export function StudentRegistry({ students, onAddStudent, onUpdateStudent }: Stu
                       {student.foto ? (
                         <img src={student.foto} alt={student.name} className="w-10 h-10 rounded-full object-cover" />
                       ) : (
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-lg ${
-                          student.genero === 'masculino' ? 'bg-blue-500' : 'bg-pink-500'
-                        }`}>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-lg ${student.genero === 'masculino' ? 'bg-blue-500' : 'bg-pink-500'
+                          }`}>
                           {student.genero === 'masculino' ? '👨' : '👩'}
                         </div>
                       )}
@@ -1087,12 +1091,11 @@ export function StudentRegistry({ students, onAddStudent, onUpdateStudent }: Stu
                     <select
                       value={student.estado}
                       onChange={(e) => onUpdateStudent(student.id, { estado: e.target.value as any })}
-                      className={`px-2 py-1 rounded text-xs font-medium border-0 cursor-pointer ${
-                        student.estado === 'ACTIVO' ? 'bg-green-100 text-green-700' :
-                        student.estado === 'INACTIVO' ? 'bg-gray-100 text-gray-700' :
-                        student.estado === 'RETIRADO' ? 'bg-red-100 text-red-700' :
-                        'bg-yellow-100 text-yellow-700'
-                      }`}
+                      className={`px-2 py-1 rounded text-xs font-medium border-0 cursor-pointer ${student.estado === 'ACTIVO' ? 'bg-green-100 text-green-700' :
+                          student.estado === 'INACTIVO' ? 'bg-gray-100 text-gray-700' :
+                            student.estado === 'RETIRADO' ? 'bg-red-100 text-red-700' :
+                              'bg-yellow-100 text-yellow-700'
+                        }`}
                     >
                       <option value="ACTIVO">ACTIVO</option>
                       <option value="INACTIVO">INACTIVO</option>

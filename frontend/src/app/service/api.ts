@@ -2,6 +2,7 @@
 //  api.ts  — Capa de acceso al backend Spring Boot (puerto 8080)
 //  Vite proxy en vite.config.ts redirige /api y /porteria → 8080
 // =============================================================
+const BASE_URL = '';
 
 const handleResponse = async (res: Response) => {
     if (!res.ok) {
@@ -50,8 +51,27 @@ export const estudiantesApi = {
     registrar: (data: object) =>
         post('/api/estudiantes', data),
 
-    actualizar: (cedula: string, data: object) =>
-        patch(`/api/estudiantes/${cedula}`, data),
+    // En api.ts — método actualizar de estudiantesApi
+    actualizar: async (cedula: string, datos: any) => {
+        const payload = {
+            ...datos,
+            // Asegurar nombres correctos para el backend
+            programa: datos.programa ?? datos.programaAcademico,
+            institucionEducativa: datos.institucionEducativa ?? datos.universidad,
+            nombreRepresentante: datos.nombreRepresentante ?? datos.nombreRepresentanteLegal,
+            celularRepresentante: datos.celularRepresentante ?? datos.celularRepresentanteLegal,
+            direccionRepresentante: datos.direccionRepresentante ?? datos.direccionRepresentanteLegal,
+            ciudadRepresentante: datos.ciudadRepresentante ?? datos.ciudadRepresentanteLegal,
+            // induccionHospitalaria como boolean
+            induccionHospitalaria: Boolean(datos.induccionHospitalaria ?? datos.induccionCompletada),
+        };
+        const res = await fetch(`${BASE_URL}/api/estudiantes/${cedula}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+        return res.json();
+    },
 
     eliminar: (cedula: string) =>
         del(`/api/estudiantes/${cedula}`),

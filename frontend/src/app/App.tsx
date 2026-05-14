@@ -323,12 +323,20 @@ export default function App() {
     if (currentUser?.role === 'estudiante' && currentUser.studentData?.id === id) {
       setCurrentUser({ ...currentUser, studentData: { ...currentUser.studentData, ...studentData } as Student });
     }
-    toast.success('Estudiante actualizado correctamente');
-    // Sincronizar con backend en background
-    const student = students.find(s => s.id === id);
-    const cedula = student?.cedula ?? id;
-    estudiantesApi.actualizar(cedula, studentData).catch((e: any) => {
+
+    // ← FIX: fusionar con datos actuales antes de enviar al backend
+    const estudianteActual = students.find(s => s.id === id);
+    if (!estudianteActual) return;
+
+    const datosCompletos = { ...estudianteActual, ...studentData };
+    const cedula = estudianteActual.cedula;
+
+    estudiantesApi.actualizar(cedula, datosCompletos).then(() => {
+      toast.success('Estudiante actualizado correctamente');
+    }).catch((e: any) => {
       toast.error('Error al guardar en el servidor: ' + (e.message ?? ''));
+      // Revertir UI en caso de error
+      setStudents(prev => prev.map(s => s.id === id ? estudianteActual : s));
     });
   };
 

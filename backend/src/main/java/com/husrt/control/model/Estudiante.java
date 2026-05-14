@@ -76,8 +76,9 @@ public class Estudiante {
     private Boolean induccionCompletada;
     private LocalDate fechaInduccion;
     private LocalDate arlVigenciaInicio;
-    private LocalDate arlVigenciaFin;
     private String estado;
+
+    private String password;
 
     public Estudiante() {
     }
@@ -499,19 +500,19 @@ public class Estudiante {
         this.arlVigenciaInicio = v;
     }
 
-    public LocalDate getArlVigenciaFin() {
-        return arlVigenciaFin;
-    }
-
-    public void setArlVigenciaFin(LocalDate v) {
-        this.arlVigenciaFin = v;
-    }
-
     public String getEstado() {
         return estado;
     }
 
     public void setEstado(String v) {
         this.estado = v;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String v) {
+        this.password = v;
     }
 }

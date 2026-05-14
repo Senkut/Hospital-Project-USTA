@@ -27,17 +27,17 @@ public class PlanPracticasRepository {
                     ap.hora_inicio,
                     ap.hora_fin,
                     ap.fecha_especifica,
-                    e.nombre || ' ' || e.apellido AS nombre_estudiante,
-                    e.cedula AS cedula_estudiante,
-                    sh.nombre AS nombre_servicio,
+                    e.nombres_completos || ' ' || e.apellidos_completos AS nombre_estudiante,
+                    e.cedula,
+                    sh.nombre                                            AS nombre_servicio,
                     sh.piso,
-                    d.nombre || ' ' || d.apellido AS nombre_docente,
+                    d.nombre || ' ' || d.apellido                        AS nombre_docente,
                     pp.id_docente
                 FROM asignacion_practica ap
-                JOIN estudiante e ON e.id_estudiante = ap.id_estudiante
-                JOIN servicio_hospitalario sh ON sh.id_servicio = ap.id_servicio
-                JOIN plan_practicas pp ON pp.id_plan = ap.id_plan
-                JOIN docente d ON d.id_docente = pp.id_docente
+                JOIN estudiante            e  ON e.id_estudiante  = ap.id_estudiante
+                JOIN servicio_hospitalario sh ON sh.id_servicio   = ap.id_servicio
+                JOIN plan_practicas        pp ON pp.id_plan        = ap.id_plan
+                JOIN docente               d  ON d.id_docente      = pp.id_docente
                 ORDER BY ap.fecha_especifica DESC, ap.hora_inicio
                 """);
     }
@@ -51,12 +51,12 @@ public class PlanPracticasRepository {
                     ap.dia_semana,
                     ap.hora_inicio,
                     ap.hora_fin,
-                    e.nombre || ' ' || e.apellido AS nombre_estudiante,
-                    e.cedula AS cedula_estudiante,
-                    sh.nombre AS nombre_servicio,
-                    d.nombre || ' ' || d.apellido AS nombre_docente
+                    e.nombres_completos || ' ' || e.apellidos_completos AS nombre_estudiante,
+                    e.cedula,
+                    sh.nombre                                            AS nombre_servicio,
+                    d.nombre || ' ' || d.apellido                        AS nombre_docente
                 FROM asignacion_practica ap
-                JOIN estudiante e ON e.id_estudiante = ap.id_estudiante
+                JOIN estudiante            e  ON e.id_estudiante  = ap.id_estudiante
                 JOIN servicio_hospitalario sh ON sh.id_servicio = ap.id_servicio
                 JOIN plan_practicas pp ON pp.id_plan = ap.id_plan
                 JOIN docente d ON d.id_docente = pp.id_docente

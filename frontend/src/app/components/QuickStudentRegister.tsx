@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 
 interface QuickStudentFormData {
   nombresCompletos: string;
-  apellidos: string;
+  apellidosCompletos: string;
   cedula: string;
   tipoDocumento: 'C.C.' | 'C.E.' | 'Pasaporte' | 'NIT' | 'Otro';
   programa: string;
@@ -24,7 +24,7 @@ export function QuickStudentRegister({ onAddStudent }: QuickStudentRegisterProps
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState<QuickStudentFormData>({
     nombresCompletos: '',
-    apellidos: '',
+    apellidosCompletos: '',
     cedula: '',
     tipoDocumento: 'C.C.',
     programa: '',
@@ -45,7 +45,7 @@ export function QuickStudentRegister({ onAddStudent }: QuickStudentRegisterProps
       institucionEducativa: formData.institucionEducativa,
       tipoVinculacion: 'Estudiante en práctica',
       nombresCompletos: formData.nombresCompletos,
-      apellidos: formData.apellidos,
+      apellidosCompletos: formData.apellidosCompletos,
       cedula: formData.cedula,
       tipoDocumento: formData.tipoDocumento,
       email: formData.email,
@@ -66,7 +66,7 @@ export function QuickStudentRegister({ onAddStudent }: QuickStudentRegisterProps
       tieneHijos: false,
 
       // Campos compatibilidad
-      name: `${formData.nombresCompletos} ${formData.apellidos}`,
+      name: `${formData.nombresCompletos} ${formData.apellidosCompletos}`,
       universidad: formData.institucionEducativa,
       induccionHospitalaria: false,
       arl: false,
@@ -86,7 +86,7 @@ export function QuickStudentRegister({ onAddStudent }: QuickStudentRegisterProps
   const resetForm = () => {
     setFormData({
       nombresCompletos: '',
-      apellidos: '',
+      apellidosCompletos: '',
       cedula: '',
       tipoDocumento: 'C.C.',
       programa: '',
@@ -159,8 +159,8 @@ export function QuickStudentRegister({ onAddStudent }: QuickStudentRegisterProps
                     <input
                       type="text"
                       required
-                      value={formData.apellidos}
-                      onChange={(e) => setFormData({ ...formData, apellidos: e.target.value })}
+                      value={formData.apellidosCompletos}
+                      onChange={(e) => setFormData({ ...formData, apellidosCompletos: e.target.value })}
                       placeholder="Ej: Pérez García"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />

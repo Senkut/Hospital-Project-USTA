@@ -42,10 +42,10 @@ public class PorteriaService {
                 }
 
                 // VALIDACIÓN 3 — ¿Tiene ARL vigente hoy?
-                if (e.getArlVigenciaFin() == null ||
-                                e.getArlVigenciaFin().isBefore(LocalDate.now())) {
-                        String vence = e.getArlVigenciaFin() != null
-                                        ? e.getArlVigenciaFin().toString()
+                if (e.getArlVigenciaInicio() == null ||
+                                e.getArlVigenciaInicio().isBefore(LocalDate.now())) {
+                        String vence = e.getArlVigenciaInicio() != null
+                                        ? e.getArlVigenciaInicio().toString()
                                         : "sin fecha";
                         return ResultadoAcceso.rechazado(
                                         "ARL vencida desde " + vence +

@@ -10,7 +10,7 @@ interface Student {
   tipoVinculacion: 'Estudiante en práctica' | 'Médico Interno' | 'Residente del programa de especialización';
   foto?: string;
   nombresCompletos: string;
-  apellidos: string;
+  apellidosCompletos: string;
   cedula: string;
   tipoDocumento: 'C.C.' | 'C.E.' | 'Pasaporte' | 'NIT' | 'Otro';
   estadoCivil: 'Soltero(a)' | 'Casado(a)' | 'Unión Libre' | 'Divorciado(a)' | 'Viudo(a)';
@@ -71,7 +71,7 @@ export function EditProfileForm({ student, onUpdateStudent, onClose }: EditProfi
     institucionEducativa: student.institucionEducativa,
     tipoVinculacion: student.tipoVinculacion,
     nombresCompletos: student.nombresCompletos,
-    apellidos: student.apellidos,
+    apellidosCompletos: student.apellidosCompletos,
     cedula: student.cedula,
     tipoDocumento: student.tipoDocumento || 'C.C.',
     email: student.email,
@@ -121,7 +121,7 @@ export function EditProfileForm({ student, onUpdateStudent, onClose }: EditProfi
 
     const updatedData = {
       ...formData,
-      name: `${formData.nombresCompletos} ${formData.apellidos}`,
+      name: `${formData.nombresCompletos} ${formData.apellidosCompletos}`,
       universidad: formData.institucionEducativa
     };
 
@@ -202,8 +202,8 @@ export function EditProfileForm({ student, onUpdateStudent, onClose }: EditProfi
                 <input
                   type="text"
                   required
-                  value={formData.apellidos}
-                  onChange={(e) => setFormData({ ...formData, apellidos: e.target.value })}
+                  value={formData.apellidosCompletos}
+                  onChange={(e) => setFormData({ ...formData, apellidosCompletos: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
                 />
               </div>
